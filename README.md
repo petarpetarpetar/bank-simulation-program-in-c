@@ -6,7 +6,7 @@ Im aware that I've swaped meanings of "account" and "bill". Account is supposed 
 still a lot to implement:
 
 
-Basic:
+#####**Basic:**
 
 writeMeny - done
 
@@ -23,7 +23,7 @@ delete account
 transactions
 
 
-Advanced:
+#####**Advanced:**
 
 search account by Name/Adress/ID_bill/JMBG.  Yes this will display more than 1 account!
 
