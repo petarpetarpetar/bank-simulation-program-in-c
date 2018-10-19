@@ -55,6 +55,7 @@ void noviNalog()
 
     if(provera_jmbg_datumRodjenja(temp.JMBG,temp.datumRodjenja)){
         generateID(&temp.ID);
+        temp.brojacR = 0; //prvi put!
         writeToFile(temp);
     }
     else{printf("___GRESKA: JMBG ne odgovara datumu rodjenja\nNije upisano nista u fajl!\n");}
@@ -109,6 +110,7 @@ void writeToFile(struct korisnik temp)
     fprintf(f,"%s \n",temp.datumRodjenja);
     fprintf(f,"%s \n",temp.adresaStanovanja);
     fprintf(f,"%s \n",temp.brojTelefona);
+    fprintf(f,"%d \n",temp.brojacR);
     fclose(f);
 
 }
@@ -135,17 +137,35 @@ void prikazSvih()
     }
 
 }
+void pretragaID(int *ptr)
+{
+    FILE* fp;
+    char ID[5];
+    printf("unesite ID korisnika za pretragu: ");
+    fflush(stdin);
+    scanf("%s",&ID);
+    char fileNameFinal[20];
+    strcpy(fileNameFinal,"./baza/");
+    strcat(fileNameFinal,ID);
+    strcat(fileNameFinal,".txt");
+
+    fp = fopen(fileNameFinal,"r");
+    if(fp == NULL){printf("ne postoji korisnik sa tim IDom ili ___GRESKA:neuspesno otvoren fajl - U pretragaID();\n");fclose(fp);*ptr=-1;return;}
+    *(ptr) = atoi(ID);
+    printf("Korisnik Pronadjen!");
+}
 void pretragaNaloga()
 {
+    int select;
     if(debug){printf("pozvano pretragaNaloga()\n");}
-    fflush();
-    printf("izaberi nacin pretrage:\n 1 - ID pretraga \n 2 - pretraga po imenu \n implementirati jos pretraga");
+    fflush(stdin);
+    printf("izaberi nacin pretrage:\n 1 - ID pretraga \n 2 - pretraga po imenu \n");
     char opcode;
     scanf("%c",&opcode);
     switch(opcode)
     {
     case '1':
-
+        pretragaID(&select);
         break;
 
     case '2':
@@ -157,6 +177,7 @@ void pretragaNaloga()
         break;
 
     }
+    printf("trenutno selektovan ID = %d\nispisi neke akcije",select);
 
 }
 

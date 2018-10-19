@@ -1,0 +1,10 @@
+petar markovic
+2204002123123 
+22/04/2002 
+Trg Draze Mihajlovica 3/7 Ugljevik 
+066062500
+Broj_racuna
+=========================
+tip
+ID_racuna
+novac

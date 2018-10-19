@@ -1,1 +1,4 @@
-0
+3
+
+menjanje countera restartovacete broj akauntova (Global reset baze podataka)
+gubitak svih podataka.
