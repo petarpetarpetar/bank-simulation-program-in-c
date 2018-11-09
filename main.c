@@ -5,7 +5,7 @@ typedef int bool;
 #define true 1;
 #define false 0;
 bool debug = 1;
-
+bool encToggle = 1;
 struct racun
 {
     int tip;
@@ -105,25 +105,56 @@ void writeToFile(struct korisnik temp)
     strcat(tempNameFinal,tempName);
     f = fopen(tempNameFinal,"w+"); //treba promeniti sa w
     if(f==NULL){printf("___FATALNA_GRESKA: fajl nije uspesno otvoren\n\t  unutar writeToFile(). informacije izgubljene\n\t\tpokusao otvoriti %s\n",tempNameFinal);fclose(f);return;}
+    enc(&temp.imeKorisnika);enc(&temp.prezimeKorisnika);enc(&temp.JMBG);enc(&temp.datumRodjenja);enc(&temp.adresaStanovanja);enc(&temp.brojTelefona);
     fprintf(f,"%s %s\n",temp.imeKorisnika,temp.prezimeKorisnika);
-    fprintf(f,"%s \n",temp.JMBG);
-    fprintf(f,"%s \n",temp.datumRodjenja);
-    fprintf(f,"%s \n",temp.adresaStanovanja);
-    fprintf(f,"%s \n",temp.brojTelefona);
-    fprintf(f,"%d \n",temp.brojacR);
+    fprintf(f,"%s\n",temp.JMBG);
+    fprintf(f,"%s\n",temp.datumRodjenja);
+    fprintf(f,"%s\n",temp.adresaStanovanja);
+    fprintf(f,"%s\n",temp.brojTelefona);
+    fprintf(f,"%d\n",temp.brojacR);
     fclose(f);
 
 }
-void enc(char *s)
+void dec(char *s)
 {
     int i=0;
-    char KEY[] = { '8', '6', '11', '5' };
+    for(i= 0; i <strlen(s);i++){
+         if(*(s+i)>96 && *(s+i)<123)
+        {
+            *(s+i) -= 3;
+            if(*(s+i)<'a')
+            {
+                *(s+i) = *(s+i) + 'z' - 'a' +1;
+            }
+        }
+        else if(*(s+i)>='A' && *(s+i)<='Z')
+        {
+            *(s+i) -= 3;
+            if(*(s+i)<'A')
+            {
+                *(s+i) = *(s+i) + 'Z' - 'A' +1;
+            }
+        }
+    }
+}
+void enc(char *s)
+{
+    int i;
+    int offsetVelika=65;
+    int offsetMala=97;
 
     for(i=0;i<strlen(s);i++)
     {
-        s[i] ^= KEY[i%4];
+       // printf("%c -> ",*(s+i));
+        if(*(s+i)>64 && *(s+i)<91){
+            *(s+i) = (((((int)(*(s+i)))-offsetVelika)+3)%26)+offsetVelika;
+        }
+        else if(*(s+i)>96 && *(s+i)<123)
+        {
+            *(s+i) = (((((int)(*(s+i)))-offsetMala)+3)%26)+offsetMala;
+        }
+        //printf("%c\n",*(s+i));
     }
-
 }
 
 void prikazSvih()
@@ -153,6 +184,7 @@ void pretragaID(int *ptr)
     if(fp == NULL){printf("ne postoji korisnik sa tim IDom ili ___GRESKA:neuspesno otvoren fajl - U pretragaID();\n");fclose(fp);*ptr=-1;return;}
     *(ptr) = atoi(ID);
     printf("Korisnik Pronadjen!");
+    fclose(fp);
 }
 void pretragaNaloga()
 {
@@ -177,10 +209,50 @@ void pretragaNaloga()
         break;
 
     }
-    printf("trenutno selektovan ID = %d\nispisi neke akcije",select);
+    printf("trenutno selektovan ID = %d\n",select);
+    ucitajNalog(select);
 
 }
 
+void ucitajNalog(int select)
+{
+    FILE* fp;
+    char fileNameFinal[20];
+    strcpy(fileNameFinal,"./baza/");
+    char idk[9];
+    itoa(select,idk,10);
+    strcat(fileNameFinal,idk);
+    strcat(fileNameFinal,".txt");
+    fp=fopen(fileNameFinal,"r");
+    if(debug)printf("otvorio %s\n",fileNameFinal);
+        //fuk
+        struct korisnik temp;
+        int i=0;
+        int acc;
+        fscanf(fp,"%s %s\n%s\n%s\n%[^\n]s\n",temp.imeKorisnika,temp.prezimeKorisnika,temp.JMBG,temp.datumRodjenja,temp.adresaStanovanja);
+        fscanf(fp,"%s\n",temp.brojTelefona);
+        fscanf(fp,"%d\n",&temp.brojacR);
+        dec(&temp.imeKorisnika);dec(&temp.prezimeKorisnika);dec(&temp.JMBG);dec(&temp.datumRodjenja);dec(&temp.adresaStanovanja);dec(&temp.brojTelefona);
+
+        easyPrint(temp);
+
+
+        //ako nijeo
+        fclose(fp);
+        printf("bibba");
+}
+void easyPrint(struct korisnik temp)
+{
+    printf("##################################\n");
+    printf("ispis informacija korisnika: \n");
+    printf("ime:      %s\n",temp.imeKorisnika);
+    printf("prezime:  %s\n",temp.prezimeKorisnika);
+    printf("JMBG:     %s\n",temp.JMBG);
+    printf("dat.Rodj: %s\n",temp.datumRodjenja);
+    printf("adresa:   %s\n",temp.adresaStanovanja);
+    printf("broj tel: %s\n",temp.brojTelefona);
+    printf("broj Rac: %d\n",temp.brojacR);
+}
 void izmenaNaloga()
 {
     if(debug){printf("pozvano izmenaNaloga()\n");}
@@ -224,10 +296,10 @@ void ispismenija(){
         pretragaNaloga();
         break;
     case '4':
-        izmenaNaloga();
+        izmenaNaloga();//treba gore
         break;
     case '5':
-        brisanjeNaloga();
+        brisanjeNaloga();//treba gore
         break;
     case '6':
         transakcija();
@@ -240,23 +312,22 @@ void ispismenija(){
 
 int main()
 {
-    while(1){
+
+    /*while(1){
         ispismenija();
         printf("zelite li da nastavite dalje? <Y/N> ");
         char temp;
         fflush(stdin);
         scanf("%c",&temp);
         if(temp == 'n' || temp == 'N'){break;}
-    }
+    }*/
 
     //test za enc i dec
-    /*char test[10]={'B','/','N','j','4','1','u','d','$'};
+    char test[9]={'Z','Y','X','W','z','y','x','w','\0'};
     enc(&test);
+    printf("%s\n",test);
+    dec(&test);
     printf("%s",test);
-    enc(&test);
-    printf("%s",test);*/
-
-
 
     return 0;
 }
