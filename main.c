@@ -26,6 +26,13 @@ struct korisnik
     char brojTelefona[13];
 };
 
+/*! \fn int read(int fd,char *buf,size_t count)
+    \brief Read bytes from a file descriptor.
+    \param fd The descriptor to read from.
+    \param buf The buffer to read into.
+    \param count The number of bytes to read.
+*/
+
 void noviNalog()
 {
     if(debug){printf("pozvano noviNalog()\n");}
@@ -92,7 +99,6 @@ int provera_jmbg_datumRodjenja(char jmbg[],char datumR[])
             if(jmbg[4]==datumR[7] && jmbg[5]==datumR[8] && jmbg[6]==datumR[9])
                 return 1;
     return 0;
-
 }
 void writeToFile(struct korisnik temp)
 {
@@ -164,7 +170,12 @@ void prikazSvih()
     int brojAkaunta = getNumAcc();
     for(i=0;i<brojAkaunta;i++)
     {
-        //pozovi pretragu za taj ID i onda ispisi podatke
+
+
+
+
+
+
     }
 
 }
@@ -175,11 +186,15 @@ void pretragaID(int *ptr)
     printf("unesite ID korisnika za pretragu: ");
     fflush(stdin);
     scanf("%s",&ID);
+    while(atoi(ID)>=getNumAcc() || atoi(ID)<0){
+        printf("pogresan unos, unesite ID ponovo: \n");
+        scanf("%s");
+    }
+
     char fileNameFinal[20];
     strcpy(fileNameFinal,"./baza/");
     strcat(fileNameFinal,ID);
     strcat(fileNameFinal,".txt");
-
     fp = fopen(fileNameFinal,"r");
     if(fp == NULL){printf("ne postoji korisnik sa tim IDom ili ___GRESKA:neuspesno otvoren fajl - U pretragaID();\n");fclose(fp);*ptr=-1;return;}
     *(ptr) = atoi(ID);
@@ -191,9 +206,10 @@ void pretragaNaloga()
     int select;
     if(debug){printf("pozvano pretragaNaloga()\n");}
     fflush(stdin);
-    printf("izaberi nacin pretrage:\n 1 - ID pretraga \n 2 - pretraga po imenu \n");
+    //printf("izaberi nacin pretrage:\n 1 - ID pretraga \n 2 - pretraga po imenu \n");
     char opcode;
-    scanf("%c",&opcode);
+    //scanf("%c",&opcode);
+    opcode = '1';
     switch(opcode)
     {
     case '1':
@@ -239,7 +255,6 @@ void ucitajNalog(int select)
 
         //ako nijeo
         fclose(fp);
-        printf("bibba");
 }
 void easyPrint(struct korisnik temp)
 {
@@ -263,9 +278,33 @@ void izmenaNaloga()
 void brisanjeNaloga()
 {
     if(debug){printf("pozvano brisanjeNaloga()\n");}
+    int status;
+  char ime[10];
+
+  printf("unesite ID korisnika kojeg zelite da obrisete \n");
+    scanf("%s",ime);
+  strcat(ime,".txt");
+  char prefix[30];
+  strcpy(prefix,"./baza/");
+  strcat(prefix,ime);
+  strcpy(ime,prefix);
+   status = remove(ime);
+
+  if (status == 0)
+    printf("%s fajl je obrisan uspesno.\n", ime);
+  else
+  {
+    printf("Nije moguce obrisati dati fajl: %s\n",ime);
+    perror("error: ");
+  }
+
+  return 0;
+}
+void dodajRacun()
+{
+
 
 }
-
 void transakcija()
 {
     if(debug){printf("pozvano transakcija()\n");}
@@ -313,21 +352,14 @@ void ispismenija(){
 int main()
 {
 
-    /*while(1){
+    while(1){
         ispismenija();
         printf("zelite li da nastavite dalje? <Y/N> ");
         char temp;
         fflush(stdin);
         scanf("%c",&temp);
         if(temp == 'n' || temp == 'N'){break;}
-    }*/
-
-    //test za enc i dec
-    char test[9]={'Z','Y','X','W','z','y','x','w','\0'};
-    enc(&test);
-    printf("%s\n",test);
-    dec(&test);
-    printf("%s",test);
+    }
 
     return 0;
 }
