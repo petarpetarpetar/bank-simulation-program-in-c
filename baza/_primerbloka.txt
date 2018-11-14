@@ -4,7 +4,9 @@ petar markovic
 Trg Draze Mihajlovica 3/7 Ugljevik 
 066062500
 Broj_racuna
-=========================
-tip
 ID_racuna
+tip
 novac
+datum_za_oroceni
+kamata
+pa sve opet mikane
