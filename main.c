@@ -131,7 +131,6 @@ void writeToFile(struct korisnik temp)
     FILE *f;
     char tempName[14];
     itoa(temp.ID, tempName, 10);
-    printf("otvaram fajl: %d wtf\n",temp.ID);
     strcat(tempName, ".txt");
     char tempNameFinal[20];
     strcpy(tempNameFinal, "baza/");
@@ -169,7 +168,7 @@ void writeToFile(struct korisnik temp)
         }
     }
     fclose(f);
-    printf("delay");
+
     char del;
     fflush(stdin);
     scanf("%c",&del);
@@ -460,6 +459,7 @@ void ispis_drugi_meni()
 }
 void drugi_meni(int select)
 {
+    if(select == -1){printf("select = -1 in drugi_meni(), wrong input");return;}
     ispis_drugi_meni();
     char opcode;
     fflush(stdin);
@@ -585,7 +585,7 @@ void brisanjeNaloga(int select) // ovo modifikovati da radi.
     if (debug)
         printf("pozvano brisanjeNaloga()\n");
     int status;
-    char ime[10];
+    char ime[40];
     itoa(select,ime,10);
     strcat(ime, ".txt");
     char prefix[30];
@@ -600,7 +600,6 @@ void brisanjeNaloga(int select) // ovo modifikovati da radi.
         printf("Nije moguce obrisati dati fajl: %s\n", ime);
         perror("error: ");
     }
-
     return;
 }
 void transakcija(int select)
@@ -636,9 +635,39 @@ void ispismenija()
     }
 }
 
+bool adminlogin()
+{
+    char ime[20];
+    printf("unesi admin ime: ");
+    fflush(stdin);
+    scanf("%s",ime);
+    char lozinka[20];
+    fflush(stdin);
+    printf("unesi lozinku: ");
+    scanf("%s",lozinka);
+    FILE* fp;
+    char wanted_ime[20];
+    char wanted_sifra[20];
+    fp = fopen("./login/login_info.txt","r");
+    fscanf(fp,"%s",wanted_ime);
+    fscanf(fp,"%s",wanted_sifra);
+    fclose(fp);
+    if(strc(ime,wanted_ime) && strc(lozinka,wanted_sifra)){return 1;}
+    return 0;
+}
+bool strc(char* first, char* second)
+{
+    if(strlen(first)!=strlen(second)){return 0;}
+    int i=0;
+    for(i=0;i<strlen(first);i++)
+    {
+        if(*(first+i) != *(second+i)){return 0;}
+    }
+    return 1;
+}
 int main()
 {
-
+    if(adminlogin())
     while (1)
     {
         ispismenija();
@@ -649,4 +678,5 @@ int main()
         if (temp == 'n' || temp == 'N')
             return 0;
     }
+    else{printf("nije tacna sifra ili ime.\n");}
 }

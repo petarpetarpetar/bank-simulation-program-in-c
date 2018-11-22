@@ -1,0 +1,4 @@
+petar
+sifra1
+
+This needs to be encrypted, will implement it later on...
