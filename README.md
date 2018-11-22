@@ -8,19 +8,21 @@ still a lot to implement:
 
 ## Basic:
 
-writeMeny - done
+- [x] writeMeny
 
-add new account - done
+- [x] add new account
 
-show all accounts
+- [x] show all accounts
 
-search account by ID - done
+- [x] search account by ID
 
-change data of an Account
+- [ ] change data of an Account
 
-delete account
+- [x] delete account 
 
-transactions
+- [x] add a bill to a account 
+
+- [ ] transactions
 
 
 ## Advanced:
