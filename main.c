@@ -168,10 +168,6 @@ void writeToFile(struct korisnik temp)
         }
     }
     fclose(f);
-
-    char del;
-    fflush(stdin);
-    scanf("%c",&del);
 }
 void dec(char *s)
 {
@@ -378,6 +374,188 @@ void pretragaID(int *ptr)
     printf("Korisnik Pronadjen!");
     fclose(fp);
 }
+bool toJeTajKorisnikJMBG(FILE* fp,char* ch)
+{
+    struct korisnik temp;
+    fscanf(fp, "%s %s\n%s\n%s\n%[^\n]s\n", temp.imeKorisnika, temp.prezimeKorisnika, temp.JMBG, temp.datumRodjenja, temp.adresaStanovanja);
+    fscanf(fp, "%s\n", temp.brojTelefona);
+    fscanf(fp, "%d\n", &temp.brojacR);
+    dec(&temp.imeKorisnika);
+    dec(&temp.prezimeKorisnika);
+    dec(&temp.JMBG);
+    dec(&temp.datumRodjenja);
+    dec(&temp.adresaStanovanja);
+    dec(&temp.brojTelefona);
+    if(temp.brojacR>0)
+    {
+        int i=0;
+        for(i=0;i<temp.brojacR;i++)
+        {
+            fscanf(fp,"%d",&temp.rac[i].ID);
+            fscanf(fp,"%d\n",&temp.rac[i].tip);
+            fscanf(fp,"%d\n",&temp.rac[i].novac);
+            fscanf(fp,"%d\n",&temp.rac[i].datum);
+            fscanf(fp,"%f\n",&temp.rac[i].kamata);
+
+        }
+    }
+    if(strc(temp.JMBG,ch)){return 1;}
+    return 0;
+
+}
+void pretragaJMBG(int* select)
+{
+
+    FILE *fp;
+    char ID[14];
+    char jmbg[14];
+    char tempNameFinal[30];
+    printf("unesite JMBG korisnika za pretragu: ");
+    fflush(stdin);
+    scanf("%s", jmbg);
+
+    char fileNameFinal[20];
+    int i=0;
+    for(i=0;i<getNumAcc();i++){
+        itoa(i,ID,10);
+        strcpy(fileNameFinal, "./baza/");
+        strcat(fileNameFinal, ID);
+        strcat(fileNameFinal, ".txt");
+        fp = fopen(fileNameFinal, "r");
+
+        if(fp == NULL)
+        {
+            printf("__pretragaJMBG_FATALNA_GREKSA: nije uspesno otvoren fajl\n");
+            fclose(fp);
+            continue;
+        }
+        if(toJeTajKorisnikJMBG(fp,jmbg)){*select = atoi(ID);fclose(fp);return;}
+        fclose(fp);
+    }//kraj fora
+    *select = -1; //ako nije nasao nista
+
+
+}
+struct korisnik driver2(int ID)
+{
+    FILE* fp;
+    struct korisnik temp;
+    char idk[20];
+    char fileNameFinal[30];
+    itoa(ID, idk, 10);
+    temp.ID = ID;
+    strcat(fileNameFinal, "./baza/");
+    strcat(fileNameFinal, idk);
+    strcat(fileNameFinal, ".txt");
+    fp = fopen(fileNameFinal, "r");
+
+    fscanf(fp, "%s %s\n%s\n%s\n%[^\n]s\n", temp.imeKorisnika, temp.prezimeKorisnika, temp.JMBG, temp.datumRodjenja, temp.adresaStanovanja);
+    fscanf(fp, "%s\n", temp.brojTelefona);
+    fscanf(fp, "%d\n", &temp.brojacR);
+    int i=0;
+    if(temp.brojacR>0)
+    {
+
+            for(i=0;i<temp.brojacR;i++)
+            {
+                fscanf(fp,"%d",&temp.rac[i].ID);
+                fscanf(fp,"%d\n",&temp.rac[i].tip);
+                fscanf(fp,"%d\n",&temp.rac[i].novac);
+                fscanf(fp,"%d\n",&temp.rac[i].datum);
+                fscanf(fp,"%f\n",&temp.rac[i].kamata);
+            }
+    }
+
+    fclose(fp);
+    return temp;
+}
+int chooseUser(int buffer[])
+{
+    int i=0;
+    struct korisnik temp;
+    printf("ID\time\tprezime\tJMBG\n");
+    for(i=0;i<20;i++)
+    {
+        if(buffer[i]==-1){continue;}
+        temp = driver2(buffer[i]);
+        printf("%d\t%s\t%s\t\t%s\n",temp.ID,temp.imeKorisnika,temp.prezimeKorisnika,temp.JMBG);
+    }
+    printf("izaberi(ID): ");
+    fflush(stdin);
+    int opcode;
+    scanf("%d",&opcode);
+    return opcode;
+}
+void pretragaIme(int* select)
+{
+    FILE *fp;
+    int buffer[20];
+    int i=0;
+    for(i=0;i<20;i++)
+    {
+        buffer[i]=-1;
+    }
+    int brojac=0;
+    char ID[14];
+    char ime[20];
+    char prezime[20];
+    char tempNameFinal[30];
+    printf("unesite Ime i prezime korisnika za pretragu: ");
+    fflush(stdin);
+    scanf("%s %s", ime,prezime);
+
+    char fileNameFinal[20];
+    for(i=0;i<getNumAcc();i++){
+        itoa(i,ID,10);
+        strcpy(fileNameFinal, "./baza/");
+        strcat(fileNameFinal, ID);
+        strcat(fileNameFinal, ".txt");
+        fp = fopen(fileNameFinal, "r");
+
+        if(fp == NULL)
+        {
+            printf("__pretragaJMBG_FATALNA_GREKSA: nije uspesno otvoren fajl\n");
+            fclose(fp);
+            continue;
+        }
+        if(toJeTajKorisnikIME(fp,ime,prezime,i)){buffer[brojac++]=i;}
+        fclose(fp);
+    }//kraj fora
+
+    *select = chooseUser(buffer);
+}
+bool toJeTajKorisnikIME(FILE* fp,char* ime, char* prezime,int a1)
+{
+    struct korisnik temp;
+    fscanf(fp, "%s %s\n%s\n%s\n%[^\n]s\n", temp.imeKorisnika, temp.prezimeKorisnika, temp.JMBG, temp.datumRodjenja, temp.adresaStanovanja);
+    fscanf(fp, "%s\n", temp.brojTelefona);
+    fscanf(fp, "%d\n", &temp.brojacR);
+    dec(&temp.imeKorisnika);
+    dec(&temp.prezimeKorisnika);
+    dec(&temp.JMBG);
+    dec(&temp.datumRodjenja);
+    dec(&temp.adresaStanovanja);
+    dec(&temp.brojTelefona);
+    temp.ID = a1;
+    if(temp.brojacR>0)
+    {
+        int i=0;
+        for(i=0;i<temp.brojacR;i++)
+        {
+            fscanf(fp,"%d",&temp.rac[i].ID);
+            fscanf(fp,"%d\n",&temp.rac[i].tip);
+            fscanf(fp,"%d\n",&temp.rac[i].novac);
+            fscanf(fp,"%d\n",&temp.rac[i].datum);
+            fscanf(fp,"%f\n",&temp.rac[i].kamata);
+
+        }
+    }
+    //ovo je bog gospod pomogao ako radi
+   if(debug)printf("proveravam redom= %s i %s ||||| %s i %s\n",strlwr(temp.imeKorisnika),strlwr(ime),strlwr(temp.prezimeKorisnika),strlwr(prezime));
+    if(strc(strlwr(temp.imeKorisnika),strlwr(ime)) && strc(strlwr(temp.prezimeKorisnika),strlwr(prezime))){return 1;}
+    return 0;
+
+}
 void pretragaNaloga()
 {
     int select;
@@ -385,7 +563,22 @@ void pretragaNaloga()
     {
         printf("pozvano pretragaNaloga()\n");
     }
-    pretragaID(&select);
+    char opcode;
+    printf("unesite nacin pretrage. 1-ID, 2-JMBG, 3-IME\n");
+    fflush(stdin);
+    scanf("%c",&opcode);
+    switch(opcode){
+    case '1':
+        pretragaID(&select);
+
+        break;
+    case '2':
+        pretragaJMBG(&select);
+        break;
+    case '3':
+        pretragaIme(&select);
+        break;
+    }
     printf("############################\n");
     printf("trenutno selektovan ID = %d\n", select);
     drugi_meni(select);
@@ -449,6 +642,7 @@ void dodajRacun(int select)
     writeToFile(temp);
 
 }
+
 void ispis_drugi_meni()
 {
     printf("dodaj racun.............2\n");
@@ -460,6 +654,8 @@ void ispis_drugi_meni()
 void drugi_meni(int select)
 {
     if(select == -1){printf("select = -1 in drugi_meni(), wrong input");return;}
+    char a;
+    do{
     ispis_drugi_meni();
     char opcode;
     fflush(stdin);
@@ -481,6 +677,12 @@ void drugi_meni(int select)
         transakcija(select); // ovo preispitati kako treba da radi.
         break;
     }
+
+    fflush(stdin);
+    printf("jos akcija ja ovim nalogom (Y/N) ");
+    scanf("%c",&a);
+
+    }while(a=='y' || a =='Y' || a=='1');
 }
 void ucitajNalog(int select)
 {
@@ -496,7 +698,6 @@ void ucitajNalog(int select)
         printf("otvorio %s\n", fileNameFinal);
     //fuk
     struct korisnik temp;
-    int i = 0;
     fscanf(fp, "%s %s\n%s\n%s\n%[^\n]s\n", temp.imeKorisnika, temp.prezimeKorisnika, temp.JMBG, temp.datumRodjenja, temp.adresaStanovanja);
     fscanf(fp, "%s\n", temp.brojTelefona);
     fscanf(fp, "%d\n", &temp.brojacR);
@@ -605,9 +806,60 @@ void brisanjeNaloga(int select) // ovo modifikovati da radi.
 void transakcija(int select)
 {
     if (debug)
+    printf("pozvano transakcija()\n");
+    FILE* fp;
+    char fileNameFinal[20];
+    strcpy(fileNameFinal, "./baza/");
+    char idk[20];
+    struct korisnik temp;
+    itoa(select, idk, 10);
+    temp.ID = select;
+    printf("idk = %s\n",idk);
+    strcat(fileNameFinal, idk);
+    strcat(fileNameFinal, ".txt");
+    fp = fopen(fileNameFinal, "r");
+     fscanf(fp, "%s %s\n%s\n%s\n%[^\n]s\n", temp.imeKorisnika, temp.prezimeKorisnika, temp.JMBG, temp.datumRodjenja, temp.adresaStanovanja);
+    fscanf(fp, "%s\n", temp.brojTelefona);
+    fscanf(fp, "%d\n", &temp.brojacR);
+    temp.ID = select;
+    dec(&temp.imeKorisnika);
+    dec(&temp.prezimeKorisnika);
+    dec(&temp.JMBG);
+    dec(&temp.datumRodjenja);
+    dec(&temp.adresaStanovanja);
+    dec(&temp.brojTelefona);
+    if(temp.brojacR>0)
     {
-        printf("pozvano transakcija()\n");
+        int i=0;
+        for(i=0;i<temp.brojacR;i++)
+        {
+            fscanf(fp,"%d",&temp.rac[i].ID);
+            fscanf(fp,"%d\n",&temp.rac[i].tip);
+            fscanf(fp,"%d\n",&temp.rac[i].novac);
+            fscanf(fp,"%d\n",&temp.rac[i].datum);
+            fscanf(fp,"%f\n",&temp.rac[i].kamata);
+
+        }
     }
+    fclose(fp);
+    int choose;
+    int money;
+    easyPrint(temp);
+    do {
+    printf("sa kog racuna: ");
+    fflush(stdin);
+    scanf("%d",&choose);
+    } while(choose<0 || choose>=temp.brojacR );
+    printf("na tom racunu imate: %d",temp.rac[choose].novac);
+    printf("unesite iznos uplate (-isplate) na racun: ");
+    fflush(stdin);
+    scanf("%d",&money);
+    temp.rac[choose].novac += money;
+    fp = fopen("./baza/transakcije.txt","a");
+    fprintf(fp,"%d/%d %d\n",temp.ID,choose,money);
+    fclose(fp);
+    writeToFile(temp);
+    return;
 }
 void ispismenija()
 {
@@ -667,7 +919,7 @@ bool strc(char* first, char* second)
 }
 int main()
 {
-    if(adminlogin())
+   // if(adminlogin())
     while (1)
     {
         ispismenija();
@@ -678,5 +930,5 @@ int main()
         if (temp == 'n' || temp == 'N')
             return 0;
     }
-    else{printf("nije tacna sifra ili ime.\n");}
+   // else{printf("nije tacna sifra ili ime.\n");}
 }

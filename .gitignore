@@ -1,0 +1,7 @@
+./bin/*
+./obj/*
+banka.cbp
+banka.depend
+banka.layout
+main.o
+run.exe
