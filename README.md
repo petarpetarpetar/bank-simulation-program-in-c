@@ -16,13 +16,13 @@ still a lot to implement:
 
 - [x] search account by ID
 
-- [ ] change data of an Account
+- [x] change data of an Account
 
 - [x] delete account 
 
 - [x] add a bill to a account 
 
-- [ ] transactions
+- [x] transactions
 
 
 ## Advanced:
@@ -30,3 +30,8 @@ still a lot to implement:
 search account by Name/Adress/ID_bill/JMBG.  Yes this will display more than 1 account!
 
 make english translation of a program
+
+
+# Note:
+
+Project was accepted and I got A grade.
